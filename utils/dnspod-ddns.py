@@ -130,6 +130,8 @@ def ddns_handler():
         setter = RecordModify(domain)
         setter.update_record(record)
         logging.info('------------------ update domain end ---------------------------------')
+    else:
+        logging.info('Domain IP:%s, not changed!' % (DNSPod.get_domain_ip(), ))
 
 
 if __name__ == "__main__":
