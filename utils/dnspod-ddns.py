@@ -41,7 +41,7 @@ class DNSPod:
         # 发送URL请求并获取json数据
         request = urllib.request.Request(url=self.url_path, data=data, headers=HEADERS_DICT)
         with urllib.request.urlopen(request) as response:
-            self.response_json = json.loads(response.read())
+            self.response_json = json.loads(response.read().decode('UTF-8'))
 
     @classmethod
     def get_current_ip(cls, format="ipv4"):
@@ -130,6 +130,8 @@ def ddns_handler():
         setter = RecordModify(domain)
         setter.update_record(record)
         logging.info('------------------ update domain end ---------------------------------')
+    else:
+        logging.info('Domain IP:%s, not changed!' % (DNSPod.get_domain_ip(), ))
 
 
 if __name__ == "__main__":
