@@ -6,16 +6,20 @@
     :desc: 本脚本用于更新DNSPOD的子域名A记录(DDNS)
 """
 import re
+import os
 import json
 import socket
 import urllib.request
 import urllib.parse
 
 import logging
-from logging.handlers import  RotatingFileHandler
+from logging.handlers import RotatingFileHandler
+
+
+LOG_PATH = "./dnspod.log" if os.name == 'nt' else "/var/log/dnspod.log"
 
 BASE_URL = "https://dnsapi.cn"
-LOGIN_TOKEN = 'ID,TOKEN'                    # DNSPOD consle, 用户中心->安全设置->API Token
+LOGIN_TOKEN = 'ID,TOKEN'              # DNSPOD consle, 用户中心->安全设置->API Token
 
 HEADERS_DICT = {
     'Accept': '*/*',
@@ -38,10 +42,17 @@ class DNSPod:
         # 生成访问URL路径
         path = re.sub(r"([A-Z][a-z]*)([A-Z][a-z]*)", r"\1.\2", self.__class__.__name__)
         self.url_path = urllib.request.urljoin(BASE_URL, path)
-        # 发送URL请求并获取json数据
-        request = urllib.request.Request(url=self.url_path, data=data, headers=HEADERS_DICT)
-        with urllib.request.urlopen(request) as response:
-            self.response_json = json.loads(response.read().decode('UTF-8'))
+        # 发送URL请求并获取json数据, 运行好好的后期报错:urlopen SSLV3_ALERT_HANDSHAKE_FAILURE error<_ssl.c:720>
+        # 排查发现Python3.5版本有问题但python3.7下不存在问题, 出错时使用requests进行请求.
+        try:
+            request = urllib.request.Request(url=self.url_path, data=data, headers=HEADERS_DICT)
+            with urllib.request.urlopen(request) as response:
+                self.response_json = json.loads(response.read().decode('UTF-8'))
+        except (Exception, ) as e:
+            import requests
+            resp = requests.post(self.url_path, data=data, headers=HEADERS_DICT)
+            self.response_json = resp.json()
+
 
     @classmethod
     def get_current_ip(cls, format="ipv4"):
@@ -110,7 +121,7 @@ class RecordModify(DNSPod):
 
 def logger_init():
     # 创建回滚文件处理器
-    file_handler = RotatingFileHandler('dnspod.log', maxBytes=10 * 1024 * 1024, backupCount=1)
+    file_handler = RotatingFileHandler(LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=1)
     # 设置日志输出格式
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s [%(levelname)s] [line:%(lineno)d] %(message)s',
@@ -137,8 +148,5 @@ def ddns_handler():
 if __name__ == "__main__":
     logger_init()
     ddns_handler()
-
-
-
 
 
