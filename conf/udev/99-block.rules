@@ -1,0 +1,4 @@
+# /etc/udev/rules.d/60-persistent-storage.rules
+SUBSYSTEM=="block", KERNEL=="sd*1", ATTRS{idProduct}=="a200", ATTRS{idVendor}=="0480", SYMLINK+="sd-toshiba"
+SUBSYSTEM=="block", ATTRS{idProduct}=="557d", ATTRS{idVendor}=="0781", SYMLINK+="sd-sandisk"
+

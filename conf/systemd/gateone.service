@@ -1,0 +1,13 @@
+[Unit]
+Description=Web-based terminal
+After=network.target remote-fs.target nss-lookup.target rc-local.service
+
+[Service]
+Type=simple
+PIDFile=/tmp/gateone.pid
+WorkingDirectory=/tmp/gateone
+ExecStart=/usr/local/bin/gateone
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

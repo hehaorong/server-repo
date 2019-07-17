@@ -1,0 +1,13 @@
+proc            /proc           proc    defaults          0       0
+PARTUUID=93ecb1da-01  /boot           vfat    defaults          0       2
+PARTUUID=93ecb1da-02  /               ext4    defaults,noatime  0       1
+# a swapfile is not a swap partition, no line here
+#   use  dphys-swapfile swap[on|off]  for that
+
+tmpfs /tmp tmpfs defaults,noatime,nosuid,size=200m 0 0
+tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=30m 0 0
+tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=80m 0 0
+tmpfs /var/spool/mqueue tmpfs defaults,noatime,nosuid,mode=0700,gid=12,size=30m 0 0
+
+
+#tmpfs /workspace/ftp/temp tmpfs defaults,noatime,nosuid,size=200m 0 0
